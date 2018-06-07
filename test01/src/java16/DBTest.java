@@ -2,9 +2,12 @@ package java16;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class DBTest {
 	Connection con = null;
@@ -14,39 +17,55 @@ public class DBTest {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			String url = "jdbc:mysql://localhost:3308/test?useSSL=false&serverTimezone=UTC";
 			con = DriverManager.getConnection(url, "test1", "test1");
+			con.setAutoCommit(false);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void selelct(String name) {
-		String sql = "select * from test where name = '" + name + "'";
+	public ArrayList<HashMap<String,String>> selelct(String name) {
+		ArrayList<HashMap<String,String>> testList = new ArrayList<HashMap<String,String>>();
+		String sql = "select * from test";
+		if(name!=null && !"".equals(name)) {
+			sql += " where name='" + name + "'";
+		}
 		Statement stmt;
 		try {
 			stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			while(rs.next()) {
-				int num = rs.getInt("num");
+				String num = rs.getString("num");
 				name = rs.getString("name");
 				String etc = rs.getString("etc");
-				System.out.println("num : " + num + ",name:"+name+",etc:"+etc);
+				HashMap<String,String> hm = new HashMap<String,String>();
+				hm.put("num", num);
+				hm.put("name", name);
+				hm.put("etc", etc);
+				testList.add(hm);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return testList;
 	}
 	
 	public void insert(int num, String name, String etc) {
 		String sql = "insert into test(num, name, etc)";
-		sql += "values(" + num +",'" + name +"','"+etc+"')";
-		Statement stmt;
+		sql += "values(?,?,?)";
+		PreparedStatement ps;
 		try {
-			stmt = con.createStatement();
-			int rCnt = stmt.executeUpdate(sql);
-			if(rCnt==1) {
-				System.out.println("입력 성공!");
-				System.out.println("num : " + num + ",name:"+name+",etc:"+etc);
+			con.setAutoCommit(false);
+			ps = con.prepareStatement(sql);
+			for(int i=1;i<=10000;i++) {
+				ps.setInt(1, i);
+				ps.setString(2, name+i);
+				ps.setString(3, etc+i);
+				ps.addBatch();
+				ps.clearParameters();
 			}
+			ps.executeBatch();
+			ps.clearBatch();
+			con.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -65,8 +84,8 @@ public class DBTest {
 	
 	public static void main(String[] args) {
 		DBTest dbt = new DBTest();
-		dbt.selelct("한길동");
-		dbt.insert(6, "인서트 테스트", "인서트 테스트");
+		dbt.insert(3, "name", "etc");
+		dbt.selelct("");
 		dbt.close();
 	}
 }
