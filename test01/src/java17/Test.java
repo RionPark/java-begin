@@ -3,6 +3,7 @@ package java17;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Scanner;
 
 public class Test {
 
@@ -31,7 +32,20 @@ public class Test {
 	}
 	
 	public static void main(String[] args) {
-		ArrayList<HashMap<String,String>> list = getList();
-		printList(list);
+		Scanner s = new Scanner(System.in);
+		System.out.println("아이디 : ");
+		String id = s.nextLine();
+		System.out.println("비밀번호 : ");
+		String pwd = s.nextLine();
+		
+		if(id.equals("test")) {
+			if(pwd.equals("test")) {
+				System.out.println("로그인 성공!");
+				return;
+			}
+			System.out.println("비밀번호가 잘못되었습니다.");
+			return;
+		}
+		System.out.println("없는 아이디입니다.");
 	}
 }
