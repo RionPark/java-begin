@@ -12,7 +12,7 @@ public class DataInsert {
 	
 	public void makeData() {
 		HashMap<String, String> hm;
-		for(int i=1;i<=10000;i++) {
+		for(int i=1;i<=10;i++) {
 			hm = new HashMap<String, String>();
 			hm.put("num", i+"");
 			hm.put("name", "name" + i);
