@@ -6,6 +6,7 @@ public class UserVO {
 	private String uPwd;
 	private String uName;
 	private int uAge;
+	
 	public int getuNo() {
 		return uNo;
 	}
